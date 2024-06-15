@@ -19,7 +19,7 @@ const Search = () => {
     console.log("submitted");
   };
   return (
-    <div className='w-[500px] flex flex-col justify-center items-center px-4 syne'>
+    <div className='w-[450px] flex flex-col justify-center items-center syne'>
       <PlaceholdersAndVanishInput
         placeholders={placeholders}
         onChange={handleChange}

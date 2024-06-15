@@ -10,6 +10,7 @@ import Connect from "./Connect";
 import CreateBtn from "./CreateBtn";
 import AskAIBtn from "./AskAIBtn";
 import { TransactionButton } from "thirdweb/react";
+import WalletBtn from "./WalletBtn";
 
 const Navbar = () => {
   const router = useRouter();
@@ -29,12 +30,14 @@ const Navbar = () => {
 
       <div className='flex flex-row items-center justify-center gap-[10px]'>
         <Search />
+        <p className=''>or</p>
         <AskAIBtn />
       </div>
 
       {/* <ConnectKitButton /> */}
       <div className='flex items-center justify-center gap-[10px]'>
         <CreateBtn />
+        <WalletBtn />
         <Connect />
       </div>
     </div>

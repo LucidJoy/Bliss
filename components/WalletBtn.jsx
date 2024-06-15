@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/router";
 
-const CreateBtn = () => {
+const WalletBtn = () => {
   const [isClicked, setIsClicked] = React.useState(false);
 
   const router = useRouter();
@@ -10,7 +10,7 @@ const CreateBtn = () => {
   const handleClick = () => {
     setIsClicked(true);
     setTimeout(() => setIsClicked(false), 200); // Adjust duration as needed
-    router.push("/create");
+    router.push("/wallet");
   };
 
   const buttonVariants = {
@@ -28,10 +28,10 @@ const CreateBtn = () => {
       animate={isClicked ? "clicked" : "initial"}
       onClick={handleClick}
     >
-      <p>Create NFT</p>
+      <p>Wallet</p>
       {/* <SquarePen height={20} width={20} /> */}
     </motion.button>
   );
 };
 
-export default CreateBtn;
+export default WalletBtn;

@@ -1,5 +1,7 @@
 import React from "react";
 import CreateBtn from "./CreateBtn";
+import { CardEffect } from "./CardEffect";
+import { PinCard } from "./PinCard";
 
 const Hero = () => {
   return (
@@ -23,7 +25,10 @@ const Hero = () => {
       </div>
 
       {/* col B */}
-      <div className='flex-1 flex items-center justify-center'>b</div>
+      <div className='flex-1 flex items-center justify-center'>
+        {/* <CardEffect /> */}
+        <PinCard />
+      </div>
     </div>
   );
 };
