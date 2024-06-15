@@ -28,6 +28,11 @@ const Connect = () => {
         chain: defineChain(sepolia),
         sponsorGas: true,
       }}
+      connectButton={{
+        style: {
+          fontFamily: "syne",
+        },
+      }}
       theme={darkTheme({
         colors: {
           accentText: "#FF6B6B",

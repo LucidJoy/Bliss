@@ -1,15 +1,12 @@
 import React, { useContext } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import Link from "next/link";
 
 import logo from "../assets/logo.svg";
-import { cn } from "@/lib/utils";
 import Search from "./Search";
 import Connect from "./Connect";
 import CreateBtn from "./CreateBtn";
 import AskAIBtn from "./AskAIBtn";
-import { TransactionButton } from "thirdweb/react";
 import WalletBtn from "./WalletBtn";
 
 const Navbar = () => {
@@ -34,7 +31,6 @@ const Navbar = () => {
         <AskAIBtn />
       </div>
 
-      {/* <ConnectKitButton /> */}
       <div className='flex items-center justify-center gap-[10px]'>
         <CreateBtn />
         <WalletBtn />

@@ -23,12 +23,12 @@ const CreateBtn = () => {
 
   return (
     <motion.button
-      className='p-[14px] px-[16px] bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 transition duration-150 ease-in-out rounded-[12px] font-semibold text-white flex items-center justify-center gap-[8px] text-[16px] syne'
+      className='p-[14px] px-[16px] bg-[#FF6B6B] hover:bg-[#FF6B6B]/90 transition duration-150 ease-in-out rounded-[12px] font-semibold text-white flex items-center justify-center gap-[8px] text-[14px]'
       variants={buttonVariants}
       animate={isClicked ? "clicked" : "initial"}
       onClick={handleClick}
     >
-      <p>Create NFT</p>
+      <p className='syne'>Create NFT</p>
       {/* <SquarePen height={20} width={20} /> */}
     </motion.button>
   );

@@ -6,6 +6,7 @@ ChartJS.register(...registerables);
 
 import Navbar from "@/components/Navbar";
 import { Separator } from "@/components/ui/separator";
+import Footer from "@/components/Footer";
 
 const data = {
   labels: ["March", "April", "May", "June"],
@@ -109,6 +110,8 @@ const ID = () => {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };
