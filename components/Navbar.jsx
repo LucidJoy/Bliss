@@ -27,7 +27,7 @@ const Navbar = () => {
 
       <div className='flex flex-row items-center justify-center gap-[10px]'>
         <Search />
-        <p className=''>or</p>
+        <p className='syne opacity-50'>or</p>
         <AskAIBtn />
       </div>
 

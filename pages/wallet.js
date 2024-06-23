@@ -1,10 +1,7 @@
-import React, { useState } from "react";
-import Cards from "react-credit-cards-2";
+import React, { useState, useEffect } from "react";
 
-import { cn } from "@/utils/cn";
 import Navbar from "@/components/Navbar";
 import { Separator } from "@/components/ui/separator";
-import { Input } from "@/components/ui/input";
 import PaymentForm from "@/components/PaymentForm";
 import Footer from "@/components/Footer";
 

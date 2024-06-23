@@ -1,5 +1,4 @@
-import Image from "next/image";
-import { Inter, Bricolage_Grotesque, Syne } from "next/font/google";
+import React, { useEffect } from "react";
 import Search from "@/components/Search";
 import Navbar from "@/components/Navbar";
 import { Separator } from "@/components/ui/separator";

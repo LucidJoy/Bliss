@@ -1,0 +1,1 @@
+what to store in ipfs - wallet.js - uploadData function

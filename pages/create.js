@@ -17,13 +17,19 @@ import Footer from "@/components/Footer";
 import AskAIBtn from "@/components/AskAIBtn";
 import Image from "next/image";
 import { cn } from "@/utils/cn";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Component() {
   const [image, setImage] = useState(null);
+  const [generatedImage, setGeneratedImage] = useState(null);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
   const [aiPrompt, setAiPrompt] = useState("");
   const [showAiModal, setShowAiModal] = useState(false);
+
+  const [aiImgLoader, setAiImgLoader] = useState(false);
 
   const handleImageUpload = (e) => {
     // setImage(e.target.files[0]);
@@ -46,13 +52,27 @@ export default function Component() {
     console.log("Minting NFT:", { image, name, price });
   };
 
-  const handleAskAi = () => {
-    setShowAiModal(true);
-  };
-
-  const handleAiPromptSubmit = () => {
-    console.log("AI Prompt:", aiPrompt);
-    setShowAiModal(false);
+  const handleAiPromptSubmit = async () => {
+    try {
+      setAiImgLoader(true);
+      const res = await axios.post(
+        "https://5dd0-43-241-193-11.ngrok-free.app/generate-image",
+        {
+          prompt: aiPrompt,
+          size: "1024x1024",
+          quality: "standard",
+          n: 1,
+        }
+      );
+      console.log(res.data);
+      setAiImgLoader(false);
+      res.data && setShowAiModal(false);
+      res.data && setGeneratedImage(res.data.image_url);
+      res.data && toast("NFT generated successfully.");
+    } catch (error) {
+      console.log(error);
+      setShowAiModal(false);
+    }
   };
 
   return (
@@ -78,11 +98,11 @@ export default function Component() {
                   <label
                     htmlFor='dropzone-file'
                     className={cn(
-                      "flex flex-col items-center justify-center w-full h-[310px] border-2 border-dashed rounded-lg cursor-pointer hover:bg-[#3c3c3c]/90 bg-[#3C3C3C] border-[#FF6B6B]",
-                      image && "h-[310px] w-[310px]"
+                      "flex flex-col items-center justify-center w-full h-[315px] border-2 border-dashed rounded-lg cursor-pointer hover:bg-[#3c3c3c]/90 bg-[#3C3C3C] border-[#FF6B6B]",
+                      image || (generatedImage && "p-[10px] h-fit w-fit")
                     )}
                   >
-                    {image ? (
+                    {image && (
                       <Image
                         src={image}
                         alt='Uploaded Image'
@@ -90,7 +110,19 @@ export default function Component() {
                         height={300}
                         className='object-contain rounded-md'
                       />
-                    ) : (
+                    )}
+
+                    {generatedImage && (
+                      <Image
+                        src={generatedImage}
+                        alt='Uploaded Image'
+                        width={300}
+                        height={300}
+                        className='object-contain rounded-md'
+                      />
+                    )}
+
+                    {image == null && !generatedImage && (
                       <div className='flex flex-col items-center justify-center pt-5 pb-6'>
                         <CloudUploadIcon className='w-10 h-10 text-gray-400' />
                         <p className='mb-2 text-sm text-gray-400 syne'>
@@ -170,7 +202,7 @@ export default function Component() {
         <DialogContent className='max-w-md'>
           <DialogHeader>
             <DialogTitle>Ask AI</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className='syne'>
               Enter your prompt and we'll generate a response.
             </DialogDescription>
           </DialogHeader>
@@ -179,15 +211,21 @@ export default function Component() {
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
               placeholder='Enter your prompt...'
-              className='min-h-[100px]'
+              className='min-h-[100px] bg-back_black'
             />
 
-            <Button
-              onClick={handleAiPromptSubmit}
-              className='bg-[#FF6B6B] text-white hover:bg-[#FF6B6B]/90'
-            >
-              Submit
-            </Button>
+            {aiImgLoader ? (
+              <Button className='bg-[#FF6B6B] text-white w-full text-[14px] pointer-events-none'>
+                <Loader2 className='h-6 w-6 animate-spin stroke-[#fff]' />
+              </Button>
+            ) : (
+              <Button
+                onClick={handleAiPromptSubmit}
+                className='bg-[#FF6B6B] text-white hover:bg-[#FF6B6B]/90 syne'
+              >
+                Submit
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
