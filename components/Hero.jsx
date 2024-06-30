@@ -13,9 +13,9 @@ const Hero = () => {
             Unleash the Power of <br /> NFTs
           </h1>
 
-          <p className='mx-auto max-w-[700px] text-xl text-gray-400'>
+          <p className='mx-auto max-w-[700px] text-xl text-white/60 syne'>
             Discover, collect, and trade the most unique and captivating NFTs on
-            our vibrant marketplace.
+            our vibrant and seamless marketplace.
           </p>
 
           <div className='w-[500px]'>

@@ -2,11 +2,12 @@ import React from "react";
 import { ThirdwebProvider, ConnectButton, darkTheme } from "thirdweb/react";
 import { sepolia, baseSepolia, defineChain } from "thirdweb/chains";
 import { createWallet, walletConnect, inAppWallet } from "thirdweb/wallets";
-import { createThirdwebClient } from "thirdweb";
+import { client } from "@/utils/client";
+// import { createThirdwebClient } from "thirdweb";
 
-const client = createThirdwebClient({
-  clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
-});
+// const client = createThirdwebClient({
+//   clientId: process.env.NEXT_PUBLIC_CLIENT_ID,
+// });
 
 const wallets = [
   createWallet("io.metamask"),
@@ -25,7 +26,7 @@ const Connect = () => {
       client={client}
       wallets={[inAppWallet()]}
       accountAbstraction={{
-        chain: defineChain(sepolia),
+        chain: defineChain(baseSepolia),
         sponsorGas: true,
       }}
       connectButton={{
@@ -43,10 +44,6 @@ const Connect = () => {
           primaryButtonText: "#fff",
         },
       })}
-      // connectModal={{
-      //   size: "wide",
-      //   showThirdwebBranding: false,
-      // }}
     />
   );
 };

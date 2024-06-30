@@ -28,7 +28,7 @@ const Navbar = () => {
       <div className='flex flex-row items-center justify-center gap-[10px]'>
         <Search />
         <p className='syne opacity-50'>or</p>
-        <AskAIBtn />
+        <AskAIBtn text='Ask AI' />
       </div>
 
       <div className='flex items-center justify-center gap-[10px]'>

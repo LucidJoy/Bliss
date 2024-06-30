@@ -1,7 +1,6 @@
 const { default: Stripe } = require("stripe");
 
-const STRIPE_SECRET_KEY =
-  "sk_test_51K6zdpSJoWGgDvdetMzAr2fjczuGEg00S7BnWW85n9r7hyDS23qKQhXy3906FftdpARuihL3lv7Kyun4mKonB2GI00xTdWdwgV";
+const STRIPE_SECRET_KEY = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
 
 const handler = async (req, res) => {
   const { method } = req;

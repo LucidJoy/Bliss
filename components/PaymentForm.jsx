@@ -4,11 +4,15 @@ import axios from "axios";
 import CryptoJS from "crypto-js";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { client } from "@/utils/client";
 
 import "react-credit-cards-2/dist/es/styles-compiled.css";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useActiveAccount } from "thirdweb/react";
+import card from "../assets/card.png";
+import Image from "next/image";
+import { upload } from "thirdweb/storage";
 // import { encryptData, decryptData } from "./encryption";
 
 const PaymentForm = () => {
@@ -38,7 +42,9 @@ const PaymentForm = () => {
   };
 
   // decrypt function
-  const decryptData = (encryptedData) => {
+  const decryptData = (e, encryptedData) => {
+    e.preventDefault();
+
     SECRET_KEY = localStorage.getItem("user_id");
 
     if (!SECRET_KEY) {
@@ -80,13 +86,17 @@ const PaymentForm = () => {
   };
 
   // upload to IPFS
-  const uploadData = async () => {
+
+  const [cardImg, setCardImg] = useState("");
+
+  const uploadData = async (e) => {
+    e.preventDefault();
+
     const cardInfo = {
       number: cardNumber,
       name: cardName,
       expiry: cardExpiry,
-      cvc: cardCVC,
-      focus: cardFocus,
+      image: { card },
     };
 
     const encData = encryptData({ cardInfo });
@@ -100,9 +110,8 @@ const PaymentForm = () => {
       url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
       data: fileData,
       headers: {
-        pinata_api_key: "0cb51fecc4820f49a32a",
-        pinata_secret_api_key:
-          "72f31cd360ddbcc84948693dfe109cb19473c9df29f9edf8f0e76a3176e14f0b",
+        pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY,
+        pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY,
         "Content-Type": "multipart/form-data",
       },
     });
@@ -114,6 +123,8 @@ const PaymentForm = () => {
 
   const handleSaveCard = async (e) => {
     e.preventDefault();
+
+    setIsSaveLoad(true);
 
     let cardInfo = {
       number: cardNumber,
@@ -136,8 +147,6 @@ const PaymentForm = () => {
       cardHash: encCardInfo,
     };
 
-    console.log(userData);
-
     try {
       const response = await axios.post(
         "http://localhost:3000/api/users",
@@ -150,10 +159,46 @@ const PaymentForm = () => {
       if (response.data) {
         console.log(response.data);
         toast("Card saved successfully.");
+
+        handleMintCardNFT();
       }
     } catch (error) {
       console.log(error.response.data.error);
+      setIsSaveLoad(false);
       toast(error.response.data.error);
+    }
+  };
+
+  const handleMintCardNFT = async () => {
+    try {
+      const res = await fetch("/api/mint-card", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address: activeAccount?.address,
+          cardImage:
+            "https://www.visasoutheasteurope.com/dam/VCOM/regional/cemea/generic-cemea/pay-with-visa/find-a-card/visa-infinite-affluent-800x450.png",
+        }),
+      });
+
+      if (res.ok) {
+        toast("NFT Card Minted!");
+
+        setIsSaveLoad(false);
+        router.push("/");
+      } else {
+        const errorData = await res.json();
+        console.error("Error minting NFT:", errorData);
+        alert("Error minting NFT: " + (errorData.message || "Unknown error"));
+        setIsSaveLoad(false);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setIsSaveLoad(false);
+    } finally {
+      setIsSaveLoad(false);
     }
   };
 
@@ -252,12 +297,14 @@ const PaymentForm = () => {
 
         <div className=' flex items-center justify-center w-full'>
           {isSaveLoad ? (
-            <div className='bg-[#FF6B6B] text-white w-full syne text-[14px]'>
+            <div className='bg-[#FF6B6B] text-white w-full text-[14px] pointer-events-none'>
               <Loader2 className='h-6 w-6 animate-spin stroke-[#fff]' />
             </div>
           ) : (
             <Button
-              onClick={(e) => handleSaveCard(e)}
+              onClick={(e) => {
+                handleSaveCard(e);
+              }}
               className='bg-[#FF6B6B] form-actions text-white hover:bg-[#FF6B6B]/90 w-full syne text-[14px]'
               disabled={
                 !activeAccount ||

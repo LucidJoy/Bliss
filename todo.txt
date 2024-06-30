@@ -1,1 +1,7 @@
 what to store in ipfs - wallet.js - uploadData function
+
+price - ok
+cvc - ok
+price histrory straight line - ok
+if owner != adress, pay with stripe or nothing
+trending unclickable - show price -  

@@ -4,9 +4,7 @@ import mongoose from "mongoose";
 const handler = async (req, res) => {
   const { method } = req;
 
-  await mongoose.connect(
-    "mongodb+srv://joyduliajan:cV8EB49pVxfoyOys@onchaincluster.thbcnae.mongodb.net/UserDB?retryWrites=true&w=majority&appName=onchainCluster"
-  );
+  await mongoose.connect(process.env.MONGODB_URI);
 
   // Handle GET requests
   if (method === "GET") {
