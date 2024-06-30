@@ -2,6 +2,7 @@
 //   "-ab-555_l8dM7Uv8kSE_Sry-0wMr9DGwqHv7ZfvdPi_rz04NouhMBSqd1mXJluwY1ajI9giFFQrc6DqCTh3PRQ";
 
 const SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY;
+const ENGINE_URL = process.env.NEXT_PUBLIC_NGROK_ENGINE_URL;
 
 const handler = async (req, res) => {
   const { method } = req;
@@ -11,7 +12,7 @@ const handler = async (req, res) => {
 
     try {
       const response = await fetch(
-        `https://localhost:3005/contract/84532/0x3e836F4Cfc8cdA2b4d24712351639b4056004F52/erc721/mint-to`,
+        `${ENGINE_URL}/contract/84532/0x3e836F4Cfc8cdA2b4d24712351639b4056004F52/erc721/mint-to`,
         {
           method: "POST",
           headers: {

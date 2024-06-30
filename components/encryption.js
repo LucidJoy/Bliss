@@ -5,7 +5,9 @@ import CryptoJS from "crypto-js";
 import { toast } from "sonner";
 
 // A secret key for encryption and decryption
-const SECRET_KEY = window.localStorage.getItem("user_id");
+const SECRET_KEY = window.localStorage.getItem(
+  `thirdwebEwsWalletUserId-${process.env.NEXT_PUBLIC_CLIENT_ID}`
+);
 
 // Function to encrypt data
 export const encryptData = (data) => {

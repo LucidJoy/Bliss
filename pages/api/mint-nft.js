@@ -3,6 +3,7 @@ import { nftCollectionContractAddress } from "@/utils/contract";
 // const SECRET_KEY =
 //   "-ab-555_l8dM7Uv8kSE_Sry-0wMr9DGwqHv7ZfvdPi_rz04NouhMBSqd1mXJluwY1ajI9giFFQrc6DqCTh3PRQ";
 const SECRET_KEY = process.env.NEXT_PUBLIC_SECRET_KEY;
+const ENGINE_URL = process.env.NEXT_PUBLIC_NGROK_ENGINE_URL;
 
 // const agent = new https.Agent({
 //   rejectUnauthorized: false,
@@ -58,7 +59,7 @@ const handler = async (req, res) => {
 
     try {
       const response = await fetch(
-        `https://localhost:3005/contract/84532/${nftCollectionContractAddress}/erc721/mint-to`,
+        `${ENGINE_URL}/contract/84532/${nftCollectionContractAddress}/erc721/mint-to`,
         {
           method: "POST",
           headers: {

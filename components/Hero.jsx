@@ -8,7 +8,7 @@ const Hero = () => {
     <div className='h-full flex'>
       {/* col A */}
       <div className='flex-1 flex items-center justify-center'>
-        <div className='flex flex-col gap-[15px]'>
+        <div className='flex flex-col gap-[15px] ml-[80px]'>
           <h1 className='bricolage text-5xl font-bold tracking-tight'>
             Unleash the Power of <br /> NFTs
           </h1>

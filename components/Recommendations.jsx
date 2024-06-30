@@ -8,6 +8,7 @@ import { contract } from "@/utils/contract";
 import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/client";
 import { TRENDY_EVENTS } from "@/constants/constants";
+import { ThreeDCardDemo } from "./ThreeDCard";
 
 const Recommendations = () => {
   const router = useRouter();
@@ -39,9 +40,11 @@ const Recommendations = () => {
                 clicked='item/1'
                 image={nft.image_url}
                 nft={nft}
+                price={nft.price}
                 trending={true}
               />
             ))}
+            {/* <ThreeDCardDemo /> */}
           </>
         }
       </div>

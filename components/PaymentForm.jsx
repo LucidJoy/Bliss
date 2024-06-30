@@ -10,9 +10,7 @@ import "react-credit-cards-2/dist/es/styles-compiled.css";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useActiveAccount } from "thirdweb/react";
-import card from "../assets/card.png";
-import Image from "next/image";
-import { upload } from "thirdweb/storage";
+
 // import { encryptData, decryptData } from "./encryption";
 
 const PaymentForm = () => {
@@ -31,21 +29,24 @@ const PaymentForm = () => {
 
   // encrypt function
   const encryptData = (data) => {
-    SECRET_KEY = localStorage.getItem("user_id");
+    SECRET_KEY = localStorage.getItem(
+      `thirdwebEwsWalletUserId-${process.env.NEXT_PUBLIC_CLIENT_ID}`
+    );
 
     if (!SECRET_KEY) {
       toast("ENC: No secret key found!");
       return;
     }
+
     const cipher = CryptoJS.AES.encrypt(JSON.stringify(data), SECRET_KEY);
     return cipher.toString();
   };
 
   // decrypt function
-  const decryptData = (e, encryptedData) => {
-    e.preventDefault();
-
-    SECRET_KEY = localStorage.getItem("user_id");
+  const decryptData = (encryptedData) => {
+    SECRET_KEY = localStorage.getItem(
+      `thirdwebEwsWalletUserId-${process.env.NEXT_PUBLIC_CLIENT_ID}`
+    );
 
     if (!SECRET_KEY) {
       toast("DEC: No secret key found!");
@@ -89,37 +90,37 @@ const PaymentForm = () => {
 
   const [cardImg, setCardImg] = useState("");
 
-  const uploadData = async (e) => {
-    e.preventDefault();
+  // const uploadData = async (e) => {
+  //   e.preventDefault();
 
-    const cardInfo = {
-      number: cardNumber,
-      name: cardName,
-      expiry: cardExpiry,
-      image: { card },
-    };
+  //   const cardInfo = {
+  //     number: cardNumber,
+  //     name: cardName,
+  //     expiry: cardExpiry,
+  //     image: { card },
+  //   };
 
-    const encData = encryptData({ cardInfo });
+  //   const encData = encryptData({ cardInfo });
 
-    const fileData = new FormData();
-    const content = new Blob([encData]);
-    fileData.append("file", content);
+  //   const fileData = new FormData();
+  //   const content = new Blob([encData]);
+  //   fileData.append("file", content);
 
-    const responseData = await axios({
-      method: "post",
-      url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
-      data: fileData,
-      headers: {
-        pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY,
-        pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+  //   const responseData = await axios({
+  //     method: "post",
+  //     url: "https://api.pinata.cloud/pinning/pinFileToIPFS",
+  //     data: fileData,
+  //     headers: {
+  //       pinata_api_key: process.env.NEXT_PUBLIC_PINATA_API_KEY,
+  //       pinata_secret_api_key: process.env.NEXT_PUBLIC_PINATA_SECRET_KEY,
+  //       "Content-Type": "multipart/form-data",
+  //     },
+  //   });
 
-    const fileUrl =
-      "https://gateway.pinata.cloud/ipfs/" + responseData.data.IpfsHash;
-    console.log(fileUrl);
-  };
+  //   const fileUrl =
+  //     "https://gateway.pinata.cloud/ipfs/" + responseData.data.IpfsHash;
+  //   console.log(fileUrl);
+  // };
 
   const handleSaveCard = async (e) => {
     e.preventDefault();
@@ -134,12 +135,18 @@ const PaymentForm = () => {
       focus: cardFocus,
     };
 
+    console.log(cardInfo);
+
     // encrypt the card details
     const encCardInfo = encryptData(cardInfo);
 
+    // console.log("enc: ", encCardInfo);
+
     // upload walletaddress, walletid & cardHash to mongodb
     const currentThirdwebWalletAddr = activeAccount.address;
-    const walletIdFromLocalStorage = localStorage.getItem("user_id");
+    const walletIdFromLocalStorage = localStorage.getItem(
+      `thirdwebEwsWalletUserId-${process.env.NEXT_PUBLIC_CLIENT_ID}`
+    );
 
     const userData = {
       walletAddress: currentThirdwebWalletAddr,
@@ -147,19 +154,18 @@ const PaymentForm = () => {
       cardHash: encCardInfo,
     };
 
+    console.log("User Data: ", userData);
+
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/users",
-        userData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const response = await axios.post("/api/users", userData, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (response.data) {
         console.log(response.data);
         toast("Card saved successfully.");
 
+        setIsSaveLoad(false);
         handleMintCardNFT();
       }
     } catch (error) {
@@ -213,6 +219,17 @@ const PaymentForm = () => {
           focused={cardFocus}
         />
       </div>
+
+      {/* <button
+        onClick={() => {
+          const data = decryptData(
+            "U2FsdGVkX1//3P+Fd4hz1yoR7ezx30jieqooA41NJARtYmPR4oMEB1H8rx3aIm6Yr+kf2Il141dtOrya0pFkXsLRvmadZRntli+ejTf7DAYVXezPqCu9JvO1yU4C7HyjnAxZOMihT4ymE59lORweEA=="
+          );
+          console.log(data);
+        }}
+      >
+        userid
+      </button> */}
 
       <form>
         <div className='mb-8 mt-8'>
@@ -297,9 +314,9 @@ const PaymentForm = () => {
 
         <div className=' flex items-center justify-center w-full'>
           {isSaveLoad ? (
-            <div className='bg-[#FF6B6B] text-white w-full text-[14px] pointer-events-none'>
+            <Button className='bg-[#FF6B6B] text-white w-full text-[14px] pointer-events-none'>
               <Loader2 className='h-6 w-6 animate-spin stroke-[#fff]' />
-            </div>
+            </Button>
           ) : (
             <Button
               onClick={(e) => {

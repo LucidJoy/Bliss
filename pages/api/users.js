@@ -47,6 +47,10 @@ const handler = async (req, res) => {
   if (method === "POST") {
     const { walletAddress, walletId, cardHash } = req.body;
 
+    console.log("walletAddress: ", walletAddress);
+    console.log("walletId: ", walletId);
+    console.log("cardHash: ", cardHash);
+
     if (!walletAddress || !walletId || !cardHash) {
       return res
         .status(400)

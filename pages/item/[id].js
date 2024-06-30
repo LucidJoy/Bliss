@@ -46,6 +46,26 @@ const CreditCardForm = () => {
 
   let SECRET_KEY = "";
 
+  const router = useRouter();
+  const { image, name, description, price, tokenId } = router.query;
+
+  const { mutate: sendTransaction } = useSendTransaction();
+  const { data } = useReadContract({
+    contract: contract,
+    method: "function ownerOf(uint256 tokenId) view returns (address)",
+    params: [tokenId],
+  });
+
+  const handleTransferNFT = () => {
+    const transaction = prepareContractCall({
+      contract,
+      method:
+        "function transferFrom(address from, address to, uint256 tokenId)",
+      params: [data, account.address, tokenId],
+    });
+    sendTransaction(transaction);
+  };
+
   const onClickPay = async () => {
     if (!stripe || !elements) return;
 
@@ -54,7 +74,8 @@ const CreditCardForm = () => {
       const { paymentIntent, error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: "http://localhost:3001",
+          // return_url: "http://localhost:3001",
+          return_url: "https://onchain-summer-joy.vercel.app/",
         },
         redirect: "if_required",
       });
@@ -64,7 +85,8 @@ const CreditCardForm = () => {
       }
       if (paymentIntent.status === "succeeded") {
         setIsComplete(true);
-        toast.success("Payment & NFT transferred complete");
+        handleTransferNFT(data, account.address);
+        toast.success("Payment & NFT transfer complete");
       }
     } catch (error) {
       console.log(error);
@@ -76,12 +98,13 @@ const CreditCardForm = () => {
 
     // get user data from  mongodb
     const userData = await axios.get(
-      `http://localhost:3000/api/users?walletAddress=${account.address}`
+      `/api/users?walletAddress=${account.address}`
     );
 
-    // decrypt function to get cardinfo
     const decryptData = (encryptedData) => {
-      SECRET_KEY = localStorage.getItem("user_id");
+      SECRET_KEY = localStorage.getItem(
+        `thirdwebEwsWalletUserId-${process.env.NEXT_PUBLIC_CLIENT_ID}`
+      );
 
       if (!SECRET_KEY) {
         toast("DEC: No secret key found!");
@@ -93,21 +116,15 @@ const CreditCardForm = () => {
     };
 
     const decCardInfo = decryptData(userData.data.cardHash);
-    console.log(decCardInfo);
 
     if (btnName === "num") {
       navigator.clipboard.writeText(decCardInfo.number);
-      toast("Copied.");
+      toast("Card number copied");
     }
 
     if (btnName === "exp") {
       navigator.clipboard.writeText(decCardInfo.expiry);
-      toast("Copied.");
-    }
-
-    if (btnName === "cvc") {
-      navigator.clipboard.writeText(decCardInfo.cvc);
-      toast("Copied.");
+      toast("Card expiry copied");
     }
   };
 
@@ -201,9 +218,6 @@ const ID = () => {
     },
   };
 
-  // const stripe = loadStripe(
-  //   "pk_test_51K6zdpSJoWGgDvdeIGGXPCauuK2nTyMK1pnQTaQHpNFzDxAaIyEE0XKTu1JMm9v0ha9NscfjjyQ1KbSP9aIMepS800yVO8nvZM"
-  // );
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
   const { mutate: sendTransaction } = useSendTransaction();
@@ -223,14 +237,30 @@ const ID = () => {
     sendTransaction(transaction);
   };
 
-  const handleApprove = () => {
+  const handleApprove = (addr) => {
     const transaction = prepareContractCall({
       contract,
       method: "function approve(address to, uint256 tokenId)",
-      params: ["0x9B0a0e0E2d3ED3E813D47e580d287F94C3d191fF", tokenId],
+      params: [addr, tokenId],
     });
     sendTransaction(transaction);
     console.log(transaction);
+  };
+
+  const decryptData = (encryptedData) => {
+    // debugger;
+    SECRET_KEY = localStorage.getItem(
+      `thirdwebEwsWalletUserId-${process.env.NEXT_PUBLIC_CLIENT_ID}`
+    );
+
+    if (!SECRET_KEY) {
+      toast("DEC: No secret key found!");
+      return;
+    }
+
+    const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
+    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+    return decryptedData;
   };
 
   const handlePay = async () => {
@@ -238,56 +268,31 @@ const ID = () => {
 
     // get user data from  mongodb
     const userData = await axios.get(
-      `http://localhost:3000/api/users?walletAddress=${account.address}`
+      `/api/users?walletAddress=${account.address}`
     );
 
-    // decrypt function to get cardinfo
-    const decryptData = (encryptedData) => {
-      SECRET_KEY = localStorage.getItem("user_id");
-
-      if (!SECRET_KEY) {
-        toast("DEC: No secret key found!");
-        return;
-      }
-      const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
-      const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-      return decryptedData;
-    };
-
     const decCardInfo = decryptData(userData.data.cardHash);
-    console.log(decCardInfo);
+    // console.log(decCardInfo);
 
     // use the data to input the card details in stripe
 
     try {
-      const res = await fetch("http://localhost:3000/api/stripe-intent", {
+      const res = await fetch("/api/stripe-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress: account?.address }),
+        body: JSON.stringify({ walletAddress: account.address }),
       });
+
       if (res.ok) {
         const json = await res.json();
         setClientSecret(json.clientSecret);
 
-        // toast.success("Payment success, transferring NFT");
-        handleTransferNFT(data, account?.address);
+        // handleTransferNFT(data, account.address);
       }
     } catch (error) {
       console.log(error);
       toast.error("Wrong");
     }
-  };
-
-  const decryptData = (encryptedData) => {
-    SECRET_KEY = localStorage.getItem("user_id");
-
-    if (!SECRET_KEY) {
-      toast("DEC: No secret key found!");
-      return;
-    }
-    const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
-    const decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-    return decryptedData;
   };
 
   return (
@@ -296,10 +301,21 @@ const ID = () => {
       <Separator />
 
       {/* <button
-        // onClick={() => console.log("FROM: ", data, "TO: ", account?.address)}
-        onClick={() => handleSetOwner()}
+        // // onClick={() => console.log("FROM: ", data, "TO: ", account?.address)}
+        onClick={() => console.log(tokenId)}
+        // joyduliajan - 0x9B0a0e0E2d3ED3E813D47e580d287F94C3d191fF
+        // onClick={() =>
+        //   handleApprove("0x9B0a0e0E2d3ED3E813D47e580d287F94C3d191fF")
+        // }
       >
         owners
+      </button>
+      <button
+        onClick={() =>
+          handleApprove("0x9B0a0e0E2d3ED3E813D47e580d287F94C3d191fF")
+        }
+      >
+        approve
       </button> */}
 
       <div className='flex flex-row bg-[#1e1e1e]'>
@@ -373,14 +389,14 @@ const ID = () => {
 
             <div className='space-x-4 mt-[30px] flex flex-row items-center'>
               {data == account?.address ? (
-                <>
-                  <div
-                    className='inline-flex h-9 items-center justify-center rounded-md border border-[#FF6B6B] bg-transparent px-4 py-2 text-sm font-medium shadow-sm select-none outline-none syne'
-                    onClick={() => handleApprove()}
-                  >
-                    You own this NFT
-                  </div>
-                </>
+                <div
+                  className='inline-flex h-9 items-center justify-center rounded-md border border-[#FF6B6B] bg-transparent px-4 py-2 text-sm font-medium shadow-sm select-none outline-none syne'
+                  onClick={() =>
+                    handleApprove("0x8747c933cB0c66a86C69DF0626790e46671e6cA4")
+                  }
+                >
+                  You own this NFT
+                </div>
               ) : (
                 <>
                   <Dialog>

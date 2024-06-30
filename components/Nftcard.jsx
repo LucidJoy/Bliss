@@ -6,7 +6,7 @@ import { MediaRenderer } from "thirdweb/react";
 import { client } from "@/utils/client";
 import { contract } from "@/utils/contract";
 
-const Nftcard = ({ text, btnName, clicked, image, nft, trending }) => {
+const Nftcard = ({ text, btnName, clicked, image, nft, trending, price }) => {
   const router = useRouter();
 
   const handleClick = () => {
@@ -52,6 +52,14 @@ const Nftcard = ({ text, btnName, clicked, image, nft, trending }) => {
           <p className='bricolage text-[16px] font-medium'>
             {nft.metadata?.attributes[0]?.value}{" "}
             <span className='text-white/80 text-sm'>ETH</span>
+          </p>
+        </div>
+      )}
+
+      {trending && (
+        <div>
+          <p className='bricolage text-[16px] font-medium'>
+            {price} <span className='text-white/80 text-sm'>ETH</span>
           </p>
         </div>
       )}
